@@ -2,7 +2,9 @@ require('dotenv').config();
 const express = require('express');
 // const mongo =  require('mongodb');
 const mongoose = require('mongoose');
-const validUrl = require('valid-url');
+// const validUrl = require('valid-url');
+const dns = require('dns');
+const urlparser = require('url');
 const shortId = require('shortid');
 const cors = require('cors');
 const app = express();
@@ -67,38 +69,72 @@ app.post('/api/shorturl', async function(req, res) {
   const urlCode = shortId.generate()
 
   // check if the url is valid or not
-  if(!validUrl.isWebUri(url_input)) {
-    res.status(401).json({
-      error: 'invalid URL'
-    })
-  } else {
-    try {
-      // check if its already in the database
-      let findOne = await URL.findOne({
-        original_url: url_input
-      })
-      if(findOne) {
-        res.json({
-          original_url: findOne.original_url,
-          short_url: findOne.short_url
+
+  const checkaddress = dns.lookup(urlparser.parse(url_input).hostname, async (err, address) => {
+    if(!address) {
+      res.json({error: 'invalid url'})
+    } else {
+      try {
+        // check if its already in the database
+        let findOne = await URL.findOne({
+          original_url: url_input
         })
-      } else {
-        // if its not exist yet then create new one and response with the result
-        findOne = new URL({
-          original_url: url_input,
-          short_url: urlCode
-        })
-        await findOne.save()
-        res.json({
-          original_url: findOne.original_url,
-          short_url: findOne.short_url
-        })
+        if(findOne) {
+          res.json({
+            original_url: findOne.original_url,
+            short_url: findOne.short_url
+          })
+        } else {
+          // if its not exist yet then create new one and response with the result
+          findOne = new URL({
+            original_url: url_input,
+            short_url: urlCode
+          })
+          await findOne.save()
+          res.json({
+            original_url: findOne.original_url,
+            short_url: findOne.short_url
+          })
+        }
+      } catch(err) {
+        console.error(err)
+        res.status(500).json('Error encountered...')
       }
-    } catch(err) {
-      console.error(err)
-      res.status(500).json('Error encountered...')
     }
-  }
+  })
+
+  // if(!validUrl.isWebUri(url_input)) {
+  //   res.status(401).json({
+  //     error: 'invalid url'
+  //   })
+  // } else {
+  //   try {
+  //     // check if its already in the database
+  //     let findOne = await URL.findOne({
+  //       original_url: url_input
+  //     })
+  //     if(findOne) {
+  //       res.json({
+  //         original_url: findOne.original_url,
+  //         short_url: findOne.short_url
+  //       })
+  //     } else {
+  //       // if its not exist yet then create new one and response with the result
+  //       findOne = new URL({
+  //         original_url: url_input,
+  //         short_url: urlCode
+  //       })
+  //       await findOne.save()
+  //       res.json({
+  //         original_url: findOne.original_url,
+  //         short_url: findOne.short_url
+  //       })
+  //     }
+  //   } catch(err) {
+  //     console.error(err)
+  //     res.status(500).json('Error encountered...')
+  //   }
+  // }
 })
 
 app.get('/api/shorturl/:short_url?', async function(req, res) {
