@@ -63,7 +63,7 @@ app.get('/api/hello', function(req, res) {
 
 app.post('/api/shorturl', async function(req, res) {
 
-  const url = req.body.url_input
+  const url_input = req.body.url_input
   const urlCode = shortId.generate()
 
   // check if the url is valid or not
@@ -75,7 +75,7 @@ app.post('/api/shorturl', async function(req, res) {
     try {
       // check if its already in the database
       let findOne = await URL.findOne({
-        original_url: url
+        original_url: url_input
       })
       if(findOne) {
         res.json({
@@ -85,7 +85,7 @@ app.post('/api/shorturl', async function(req, res) {
       } else {
         // if its not exist yet then create new one and response with the result
         findOne = new URL({
-          original_url: url,
+          original_url: url_input,
           short_url: urlCode
         })
         await findOne.save()
