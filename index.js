@@ -65,20 +65,20 @@ app.get('/api/hello', function(req, res) {
 
 app.post('/api/shorturl', async function(req, res) {
 
-  const url_input = req.body.url_input
+  const url = req.body.url_input
   // const urlCode = shortId.generate()
   const urlCode = Math.floor(Math.random() * 100000);
 
   // check if the url is valid or not
 
-  const checkaddress = dns.lookup(urlparser.parse(url_input).hostname, async (err, address) => {
+  const checkaddress = dns.lookup(urlparser.parse(url).hostname, async (err, address) => {
     if(!address) {
       res.json({error: 'invalid url'})
     } else {
       try {
         // check if its already in the database
         let findOne = await URL.findOne({
-          original_url: url_input
+          original_url: url
         })
         if(findOne) {
           res.json({
@@ -88,7 +88,7 @@ app.post('/api/shorturl', async function(req, res) {
         } else {
           // if its not exist yet then create new one and response with the result
           findOne = new URL({
-            original_url: url_input,
+            original_url: url,
             short_url: urlCode
           })
           await findOne.save()
