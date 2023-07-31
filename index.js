@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 const Schema = mongoose.Schema;
 const urlSchema = new Schema({
   original_url: String,
-  short_url: String
+  short_url: Number,
 })
 const URL = mongoose.model("URL", urlSchema);
 
@@ -66,7 +66,8 @@ app.get('/api/hello', function(req, res) {
 app.post('/api/shorturl', async function(req, res) {
 
   const url_input = req.body.url_input
-  const urlCode = shortId.generate()
+  // const urlCode = shortId.generate()
+  const urlCode = Math.floor(Math.random() * 100000);
 
   // check if the url is valid or not
 
