@@ -67,7 +67,7 @@ app.post('/api/shorturl', async function(req, res) {
   const urlCode = shortId.generate()
 
   // check if the url is valid or not
-  if(!validUrl.isWebUri(url)) {
+  if(!validUrl.isWebUri(url_input)) {
     res.status(401).json({
       error: 'invalid URL'
     })
