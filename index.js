@@ -66,6 +66,8 @@ app.get('/api/hello', function(req, res) {
 app.post('/api/shorturl', async function(req, res) {
 
   const url = req.body.url_input
+  console.log({ url });
+  console.log(typeof url);
   // const urlCode = shortId.generate()
   const urlCode = Math.floor(Math.random() * 100000);
 
