@@ -65,7 +65,7 @@ app.get('/api/hello', function(req, res) {
 
 app.post('/api/shorturl', async function(req, res) {
 
-  const url = req.body.url_input
+  const url = req.body.url
   console.log({ url });
   console.log(typeof url);
   // const urlCode = shortId.generate()
